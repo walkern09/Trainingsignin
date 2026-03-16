@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Sign-In System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sign-In Form */
+        .signin-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .signin-panel h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .signin-panel p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Attendees List */
+        .attendees-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .attendees-panel h2 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .attendee-count {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .attendees-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .attendee-item {
+            padding: 16px;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .attendee-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .attendee-meta {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .attendee-time {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .no-attendees {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: notificationSlide 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes notificationSlide {
+            from {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.success {
+            border-left: 4px solid #4caf50;
+        }
+
+        .notification.success .icon {
+            color: #4caf50;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification .icon {
+            font-size: 20px;
+        }
+
+        .notification-text {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .clear-btn {
+            margin-top: 20px;
+            padding: 10px 16px;
+            background: #f0f0f0;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .clear-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .sound-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .sound-toggle input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sign-In Form -->
+        <div class="signin-panel">
+            <h1>📋 Training Sign-In</h1>
+            <p>Welcome! Please sign in below to record your attendance.</p>
+
+            <form id="signinForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name *</label>
+                    <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="service">Service</label>
+                    <input type="text" id="service" name="service" placeholder="e.g., Greenacres, Junction">
+                </div>
+
+                <div class="form-group">
+                    <label for="trainingName">Training Name *</label>
+                    <input type="text" id="trainingName" name="trainingName" required placeholder="Enter the training name">
+                </div>
+
+                <button type="submit" class="submit-btn">Sign In</button>
+            </form>
+
+            <div class="sound-toggle">
+                <input type="checkbox" id="soundToggle" checked>
+                <label for="soundToggle" style="margin: 0; font-weight: 400;">Play notification sound</label>
+            </div>
+        </div>
+
+        <!-- Attendees List -->
+        <div class="attendees-panel">
+            <h2>✓ Signed In Attendees</h2>
+            <div class="attendee-count">
+                <span id="attendeeCount">0</span> people have signed in
+            </div>
+
+            <div class="attendees-list" id="attendeesList">
+                <div class="no-attendees">No attendees yet. Sign-ins will appear here.</div>
+            </div>
+
+            <button class="clear-btn" onclick="clearAllAttendees()">Clear All Records</button>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let attendees = JSON.parse(localStorage.getItem('trainingAttendees')) || [];
+        let soundEnabled = JSON.parse(localStorage.getItem('soundEnabled')) ?? true;
+        const FORMSPREE_ID = 'xjgaaodv';
+
+        // Initialize
+        document.getElementById('soundToggle').checked = soundEnabled;
+        updateAttendeesList();
+
+        // Form submission
+        document.getElementById('signinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value;
+            const service = document.getElementById('service').value || 'Not specified';
+            const trainingName = document.getElementById('trainingName').value;
+            const currentTime = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const currentDate = new Date().toLocaleDateString();
+
+            const attendee = {
+                id: Date.now(),
+                fullName: fullName,
+                service: service,
+                trainingName: trainingName,
+                signInTime: currentTime,
+                signInDate: currentDate
+            };
+
+            // Check for duplicates
+            const isDuplicate = attendees.some(a => a.fullName === attendee.fullName && a.signInDate === attendee.signInDate);
+            if (isDuplicate) {
+                showNotification('⚠️ ' + attendee.fullName + ' has already signed in today.');
+                return;
+            }
+
+            // Send email via Formspree
+            if (FORMSPREE_ID !== 'YOUR_FORMSPREE_ID') {
+                fetch('https://formspree.io/f/' + FORMSPREE_ID, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: fullName,
+                        service: service,
+                        training: trainingName,
+                        time: currentTime,
+                        date: currentDate
+                    })
+                }).catch(err => console.log('Email sent'));
+            }
+
+            // Add to attendees list
+            attendees.unshift(attendee);
+            localStorage.setItem('trainingAttendees', JSON.stringify(attendees));
+
+            // Show notification
+            showNotification('✓ ' + attendee.fullName + ' signed in successfully');
+
+            // Play sound if enabled
+            if (document.getElementById('soundToggle').checked) {
+                playNotificationSound();
+            }
+
+            // Reset form
+            this.reset();
+            document.getElementById('fullName').focus();
+
+            // Update UI
+            updateAttendeesList();
+        });
+
+        // Update attendees list
+        function updateAttendeesList() {
+            const list = document.getElementById('attendeesList');
+            const count = document.getElementById('attendeeCount');
+
+            count.textContent = attendees.length;
+
+            if (attendees.length === 0) {
+                list.innerHTML = '<div class="no-attendees">No attendees yet. Sign-ins will appear here.</div>';
+                return;
+            }
+
+            list.innerHTML = attendees.map(attendee => `
+                <div class="attendee-item">
+                    <div class="attendee-name">${attendee.fullName}</div>
+                    <div class="attendee-meta">
+                        <span class="attendee-time">${attendee.signInTime}</span> • 
+                        ${attendee.service} • ${attendee.trainingName}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification success';
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <div class="icon">📬</div>
+                    <div class="notification-text">${message}</div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        // Play notification sound
+        function playNotificationSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Clear all attendees
+        function clearAllAttendees() {
+            if (confirm('Are you sure you want to clear all sign-in records? This cannot be undone.')) {
+                attendees = [];
+                localStorage.removeItem('trainingAttendees');
+                updateAttendeesList();
+                showNotification('✓ All records cleared');
+            }
+        }
+
+        // Sound toggle
+        document.getElementById('soundToggle').addEventListener('change', function() {
+            soundEnabled = this.checked;
+            localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+        });
+    </script>
+</body>
+</html>
